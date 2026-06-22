@@ -174,7 +174,18 @@ const eyePageCount = Math.ceil(eyeTextures.length / eyePageSize);
 let currentEyePage = 0;
 let eyeTouchStartX = 0;
 
+function loadEyePage(pageIndex) {
+  const page = eyeTrack.querySelector(`.eye-page:nth-child(${pageIndex + 1})`);
+  if (!page) return;
+
+  page.querySelectorAll('img[data-src]').forEach((image) => {
+    image.src = image.dataset.src;
+    image.removeAttribute('data-src');
+  });
+}
+
 function updateEyeCarousel() {
+  loadEyePage(currentEyePage);
   eyeTrack.style.transform = `translateX(-${currentEyePage * 100}%)`;
   eyeCurrentPageLabel.textContent = String(currentEyePage + 1).padStart(2, '0');
   eyePreviousButton.disabled = currentEyePage === 0;
@@ -186,7 +197,7 @@ if (eyeTrack) {
     const pageItems = eyeTextures.slice(pageIndex * eyePageSize, (pageIndex + 1) * eyePageSize);
     return `<div class="eye-page" aria-label="アイテクスチャ ${pageIndex + 1}ページ目">${pageItems.map((item, itemIndex) => `
       <a class="product-card" href="https://addhard.booth.pm/items/${item.id}" target="_blank" rel="noopener noreferrer">
-        <div class="product-image"><img src="${item.image}" alt="${getEyeDisplayName(item)} eye texture" loading="lazy" referrerpolicy="no-referrer"></div>
+        <div class="product-image"><img ${pageIndex === 0 ? `src="${item.image}"` : `data-src="${item.image}"`} alt="${getEyeDisplayName(item)} eye texture" loading="lazy" decoding="async" referrerpolicy="no-referrer"></div>
         <div class="product-meta"><div><span>EYE TEXTURE / ${String(pageIndex * eyePageSize + itemIndex + 1).padStart(2, '0')}</span><h3>${getEyeDisplayName(item)}</h3></div><i>↗</i></div>
       </a>
     `).join('')}</div>`;
