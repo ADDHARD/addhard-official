@@ -2,11 +2,13 @@ const menuButton = document.querySelector('.menu-button');
 const navigation = document.querySelector('.navigation');
 const navigationLinks = document.querySelectorAll('.navigation a');
 const header = document.querySelector('.header');
+const mobileMenuQuery = window.matchMedia('(max-width: 760px)');
 
 function toggleMenu(forceClose = false) {
   const isOpen = forceClose ? false : !navigation.classList.contains('open');
 
   navigation.classList.toggle('open', isOpen);
+  navigation.inert = mobileMenuQuery.matches && !isOpen;
   menuButton.classList.toggle('active', isOpen);
   header.classList.toggle('mobile-menu-open', isOpen);
   document.body.classList.toggle('menu-open', isOpen);
@@ -19,6 +21,12 @@ function toggleMenu(forceClose = false) {
 
 menuButton.addEventListener('click', () => toggleMenu());
 navigationLinks.forEach((link) => link.addEventListener('click', () => toggleMenu(true)));
+
+navigation.inert = mobileMenuQuery.matches;
+mobileMenuQuery.addEventListener('change', (event) => {
+  if (!event.matches && navigation.classList.contains('open')) toggleMenu(true);
+  navigation.inert = event.matches && !navigation.classList.contains('open');
+});
 
 document.addEventListener('keydown', (event) => {
   if (!navigation.classList.contains('open')) return;

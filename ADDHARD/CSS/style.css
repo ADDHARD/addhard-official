@@ -175,10 +175,12 @@ footer p { margin: 0; }
     overscroll-behavior: none;
     pointer-events: none;
     touch-action: none;
-    transition: opacity .25s;
+    visibility: hidden;
+    transition: opacity .25s, visibility 0s linear .25s;
   }
-  .navigation.open { opacity: 1; pointer-events: auto; }
-  .navigation a { display: grid; width: min(100%, 430px); min-height: clamp(37px, 7dvh, 58px); place-items: center; line-height: 1; pointer-events: auto; touch-action: manipulation; }
+  .navigation.open { opacity: 1; pointer-events: auto; visibility: visible; transition-delay: 0s; }
+  .navigation a { display: grid; width: min(100%, 430px); min-height: clamp(37px, 7dvh, 58px); place-items: center; line-height: 1; pointer-events: none; touch-action: manipulation; }
+  .navigation.open a { pointer-events: auto; }
   .navigation a::after { display: none; }
   .hero > img { object-position: 54% center; }
   .hero-copy { bottom: 9vh; left: 20px; }
