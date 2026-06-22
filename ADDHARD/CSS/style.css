@@ -124,6 +124,10 @@ img { display: block; max-width: 100%; }
 .member-card p { margin: 0 0 8px; color: #96710d; font-size: 9px; font-weight: 700; letter-spacing: .16em; }
 .member-card h3 { margin: 0 0 22px; font-size: clamp(30px, 3.2vw, 48px); letter-spacing: -.05em; }
 .member-card small { font-size: 8px; letter-spacing: .13em; }
+.member-x { display: grid; grid-template-columns: 18px 1fr auto; gap: 10px; align-items: center; margin-top: 22px; padding-top: 15px; border-top: 1px solid var(--line); font-size: 10px; letter-spacing: .08em; transition: color .25s, padding .25s; }
+.member-x:hover { padding-right: 5px; padding-left: 5px; color: #96710d; }
+.member-x svg { width: 16px; height: 16px; fill: currentColor; }
+.member-x i { font-style: normal; }
 
 .contact-links { display: grid; grid-template-columns: 1.35fr .65fr; color: var(--paper); background: var(--ink); border-top: 1px solid rgba(238,233,220,.2); }
 .contact-block, .links-block { padding: clamp(85px, 9vw, 140px) 4vw; }
