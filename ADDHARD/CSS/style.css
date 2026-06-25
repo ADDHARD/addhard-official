@@ -127,6 +127,17 @@ img { display: block; max-width: 100%; }
 .member-x svg { width: 16px; height: 16px; fill: currentColor; }
 .member-x i { font-style: normal; }
 
+.qa { display: grid; grid-template-columns: .8fr 1.2fr; gap: clamp(45px, 7vw, 100px); padding: clamp(90px, 10vw, 150px) max(4vw, calc((100vw - 1280px) / 2)); background: var(--cream); border-top: 1px solid var(--line); }
+.qa-heading h2 { margin: 40px 0 0; font-size: clamp(54px, 7.5vw, 112px); letter-spacing: -.075em; line-height: .78; }
+.qa-list { border-top: 1px solid var(--line); }
+.qa-list details { border-bottom: 1px solid var(--line); }
+.qa-list summary { display: grid; grid-template-columns: 58px 1fr auto; gap: 18px; align-items: center; padding: 28px 0; font-size: clamp(17px, 1.7vw, 24px); font-weight: 700; letter-spacing: -.03em; cursor: pointer; list-style: none; }
+.qa-list summary::-webkit-details-marker { display: none; }
+.qa-list summary::after { content: "+"; font-size: 20px; font-weight: 500; transition: transform .25s; }
+.qa-list details[open] summary::after { transform: rotate(45deg); }
+.qa-list summary span { color: #96710d; font-size: 10px; letter-spacing: .16em; }
+.qa-list p { max-width: 720px; margin: -8px 0 28px 76px; font-size: 14px; line-height: 1.9; }
+
 .contact-links { display: grid; grid-template-columns: 1.35fr .65fr; color: var(--paper); background: var(--ink); border-top: 1px solid rgba(238,233,220,.2); }
 .contact-block, .links-block { padding: clamp(85px, 9vw, 140px) 4vw; }
 .contact-block { border-right: 1px solid rgba(238,233,220,.2); }
@@ -217,6 +228,10 @@ footer p { margin: 0; }
   .member-grid { grid-template-columns: 1fr; }
   .member-card { min-height: 275px; }
   .member-mark { width: 75px; }
+  .qa { grid-template-columns: 1fr; padding: 80px 20px; }
+  .qa-heading h2 { margin-top: 40px; font-size: 15vw; }
+  .qa-list summary { grid-template-columns: 46px 1fr auto; gap: 12px; padding: 24px 0; }
+  .qa-list p { margin: -4px 0 24px 58px; }
   .contact-links { grid-template-columns: 1fr; }
   .contact-block, .links-block { padding: 80px 20px; }
   .contact-block { border-right: 0; border-bottom: 1px solid rgba(238,233,220,.2); }
