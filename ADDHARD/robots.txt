@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://addhard-official.pages.dev/sitemap.xml

@@ -49,23 +49,25 @@ document.addEventListener('keydown', (event) => {
 
 document.querySelector('#year').textContent = new Date().getFullYear();
 
-const revealTargets = document.querySelectorAll('.section, .contact');
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach((entry) => {
-    if (entry.isIntersecting) {
-      entry.target.animate(
-        [
-          { opacity: 0, transform: 'translateY(35px)' },
-          { opacity: 1, transform: 'translateY(0)' }
-        ],
-        { duration: 700, easing: 'cubic-bezier(.2,.8,.2,1)', fill: 'both' }
-      );
-      observer.unobserve(entry.target);
-    }
-  });
-}, { threshold: 0.12 });
+const revealTargets = document.querySelectorAll('.section, .item-catalog, .install-guide, .team, .qa, .contact-links');
+if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.animate(
+          [
+            { opacity: 0, transform: 'translateY(35px)' },
+            { opacity: 1, transform: 'translateY(0)' }
+          ],
+          { duration: 700, easing: 'cubic-bezier(.2,.8,.2,1)', fill: 'both' }
+        );
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
 
-revealTargets.forEach((target) => observer.observe(target));
+  revealTargets.forEach((target) => observer.observe(target));
+}
 
 const productTrack = document.querySelector('.product-track');
 const productPages = document.querySelectorAll('.product-page');
@@ -197,7 +199,7 @@ if (eyeTrack) {
     const pageItems = eyeTextures.slice(pageIndex * eyePageSize, (pageIndex + 1) * eyePageSize);
     return `<div class="eye-page" aria-label="アイテクスチャ ${pageIndex + 1}ページ目">${pageItems.map((item, itemIndex) => `
       <a class="product-card" href="https://addhard.booth.pm/items/${item.id}" target="_blank" rel="noopener noreferrer">
-        <div class="product-image"><img ${pageIndex === 0 ? `src="${item.image}"` : `data-src="${item.image}"`} alt="${getEyeDisplayName(item)} eye texture" loading="lazy" decoding="async" referrerpolicy="no-referrer"></div>
+        <div class="product-image"><img ${pageIndex === 0 ? `src="${item.image}"` : `data-src="${item.image}"`} alt="${getEyeDisplayName(item)} eye texture" width="620" height="620" loading="lazy" decoding="async" referrerpolicy="no-referrer"></div>
         <div class="product-meta"><div><span>EYE TEXTURE / ${String(pageIndex * eyePageSize + itemIndex + 1).padStart(2, '0')}</span><h3>${getEyeDisplayName(item)}</h3></div><i>↗</i></div>
       </a>
     `).join('')}</div>`;
