@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "include": [
+    "/*"
+  ],
+  "exclude": [
+    "/sitemap.xml",
+    "/robots.txt",
+    "/google183c793b1275e4e6.html",
+    "/CSS/sitemap.xml",
+    "/CSS/sitemap.txt",
+    "/JS/sitemap.xml"
+  ]
+}
