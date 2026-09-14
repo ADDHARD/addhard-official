@@ -1,3 +1,112 @@
+function renderNewsArchivePage() {
+  const normalizedPath = window.location.pathname.replace(/\\/g, '/');
+  if (!normalizedPath.endsWith('/news.html')) return;
+
+  const isHtmlFolderPage = normalizedPath.endsWith('/HTML/news.html');
+  const homePath = isHtmlFolderPage ? './index.html' : './HTML/index.html';
+
+  document.title = 'NEWS ARCHIVE | ADDHARD公式サイト';
+  const description = document.querySelector('meta[name="description"]');
+  if (description) {
+    description.setAttribute('content', 'ADDHARD公式サイトのお知らせ履歴。販売情報、キャンペーン、更新情報をまとめています。');
+  }
+
+  document.body.innerHTML = `
+    <header class="header archive-header">
+      <a class="wordmark" href="${homePath}#home" aria-label="ADDHARD ホーム">𝐀𝐃𝐃𝐇𝐀𝐑𝐃</a>
+
+      <button class="menu-button" type="button" aria-label="メニューを開く" aria-expanded="false">
+        <span></span><span></span>
+      </button>
+
+      <nav class="navigation" aria-label="メインナビゲーション">
+        <a href="${homePath}#about">ABOUT</a>
+        <a href="${homePath}#news">NEWS</a>
+        <a href="${homePath}#item">ITEM</a>
+        <a href="${homePath}#tools">Tools</a>
+        <a href="${homePath}#qa">Q&amp;A</a>
+        <a href="https://discord.com/invite/wA6N35jYB5" target="_blank" rel="noopener noreferrer">CONTACT ↗</a>
+        <a href="https://addhard.booth.pm/" target="_blank" rel="noopener noreferrer">BOOTH ↗</a>
+        <a href="${homePath}#links">LINKS</a>
+      </nav>
+    </header>
+
+    <main class="archive-main">
+      <section class="archive-hero">
+        <div class="archive-copy">
+          <p class="section-label">NEWS ARCHIVE</p>
+          <h1>ALL<br>NEWS.</h1>
+          <p>ADDHARDの販売情報、キャンペーン、サイト更新のお知らせを時系列でまとめています。</p>
+          <a href="${homePath}#news">トップのお知らせへ戻る <span>↗</span></a>
+        </div>
+      </section>
+
+      <section class="archive-list" aria-label="お知らせ履歴">
+        <article class="archive-item">
+          <time datetime="2026-09-14">2026.09.14</time>
+          <div>
+            <h2>ADDHARD-Milltina Shapekey 販売前プレゼントキャンペーン開催中！！</h2>
+            <p>Milltina Shapekeyの販売前プレゼントキャンペーンを開催中です。参加方法や詳細はXの投稿から確認できます。</p>
+            <a href="https://x.com/garyu311/status/2099423155647631592?s=20" target="_blank" rel="noopener noreferrer">Xで詳細を見る <span>↗</span></a>
+          </div>
+        </article>
+
+        <article class="archive-item">
+          <time datetime="2026-09-14">2026.09.14</time>
+          <div>
+            <h2>ADDHARD-Milltina Shapekey 予告開始！！</h2>
+            <p>Milltina向け追加シェイプキーの商品ページを公開しました。商品内容や販売情報はBOOTHから確認できます。</p>
+            <a href="https://addhard.booth.pm/items/8821073" target="_blank" rel="noopener noreferrer">BOOTHで見る <span>↗</span></a>
+          </div>
+        </article>
+
+        <article class="archive-item">
+          <time datetime="2026-06-25">2026.06.25</time>
+          <div>
+            <h2>Q&amp;Aページを追加しました。</h2>
+            <p>導入時によくある質問を確認できるQ&amp;Aセクションを追加しました。今後も問い合わせ内容に合わせて更新していきます。</p>
+            <a href="${homePath}#qa">Q&amp;Aを見る <span>↓</span></a>
+          </div>
+        </article>
+
+        <article class="archive-item">
+          <time datetime="2026-06-25">2026.06.25</time>
+          <div>
+            <h2>ADDHARD-Chocolat Shapekeyの販売開始！！</h2>
+            <p>Chocolat向け追加シェイプキーの販売を開始しました。対応内容や商品詳細はBOOTHから確認できます。</p>
+            <a href="https://addhard.booth.pm/items/8511130" target="_blank" rel="noopener noreferrer">BOOTHで見る <span>↗</span></a>
+          </div>
+        </article>
+
+        <article class="archive-item">
+          <time datetime="2026-06-22">2026.06.22</time>
+          <div>
+            <h2>ADDHARD ウェブサイトをオープンしました。</h2>
+            <p>ADDHARDの公式サイトを公開しました。商品情報、導入方法、メンバー情報、リンクをこのサイトにまとめています。</p>
+            <a href="${homePath}#home">トップへ戻る <span>↗</span></a>
+          </div>
+        </article>
+
+        <article class="archive-item">
+          <time datetime="2026-06-19">2026.06.19</time>
+          <div>
+            <h2>ADDHARD-Chocolat Shapekey 販売前キャンペーン開催！！</h2>
+            <p>Chocolat Shapekeyの販売前キャンペーンを開催しました。キャンペーン投稿はXから確認できます。</p>
+            <a href="https://x.com/garyu311/status/2067729316805222594?s=20" target="_blank" rel="noopener noreferrer">Xで詳細を見る <span>↗</span></a>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <footer>
+      <a class="footer-logo" href="${homePath}#home">𝐀𝐃𝐃𝐇𝐀𝐑𝐃</a>
+      <div><p>© <span id="year"></span> ADDHARD</p></div>
+    </footer>
+  `;
+}
+
+renderNewsArchivePage();
+
 const menuButton = document.querySelector('.menu-button');
 const navigation = document.querySelector('.navigation');
 const navigationLinks = document.querySelectorAll('.navigation a');
