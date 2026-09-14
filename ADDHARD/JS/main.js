@@ -1,9 +1,10 @@
 function renderNewsArchivePage() {
   const normalizedPath = window.location.pathname.replace(/\\/g, '/');
-  if (!normalizedPath.endsWith('/news.html')) return;
+  const isNewsArchivePath = normalizedPath.endsWith('/news.html') || normalizedPath.endsWith('/CSS/news');
+  if (!isNewsArchivePath) return;
 
   const isHtmlFolderPage = normalizedPath.endsWith('/HTML/news.html');
-  const isCssFolderPage = normalizedPath.endsWith('/CSS/news.html');
+  const isCssFolderPage = normalizedPath.endsWith('/CSS/news.html') || normalizedPath.endsWith('/CSS/news');
   const homePath = isHtmlFolderPage ? './index.html' : isCssFolderPage ? '../HTML/index.html' : './HTML/index.html';
 
   document.title = 'NEWS ARCHIVE | ADDHARD公式サイト';

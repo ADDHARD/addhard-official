@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="same-origin">
+  <meta name="description" content="ADDHARD公式サイトのお知らせ履歴。販売情報、キャンペーン、更新情報をまとめています。">
+  <title>NEWS ARCHIVE | ADDHARD公式サイト</title>
+  <link rel="canonical" href="https://addhard-official.pages.dev/news.html">
+  <link rel="icon" type="image/png" sizes="32x32" href="../IMG/favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="../IMG/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <meta name="google-site-verification" content="C6hWKOajmXZlic_TrsDZ540OT6UKZkqvoket5f2dyo0">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <noscript>
+    <main class="archive-main">
+      <section class="archive-hero">
+        <div class="archive-copy">
+          <p class="section-label">NEWS ARCHIVE</p>
+          <h1>ALL<br>NEWS.</h1>
+          <p>このページを表示するにはJavaScriptを有効にしてください。</p>
+          <a href="../HTML/index.html#news">トップのお知らせへ戻る <span>↗</span></a>
+        </div>
+      </section>
+    </main>
+  </noscript>
+  <script src="../JS/main.js?v=20260914-news"></script>
+</body>
+</html>
