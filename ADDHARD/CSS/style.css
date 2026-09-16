@@ -162,6 +162,10 @@ img { display: block; max-width: 100%; }
 .qa-list details[open] summary::after { transform: rotate(45deg); }
 .qa-list summary span { color: #96710d; font-size: 10px; letter-spacing: .16em; }
 .qa-list p { max-width: 720px; margin: -8px 0 28px 76px; font-size: 14px; line-height: 1.9; }
+.qa-list p a { color: #956b00; font-weight: 700; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+.qa-list p a:hover { color: var(--ink); }
+.qa-list p a:focus-visible { outline: 2px solid #956b00; outline-offset: 4px; }
+.qa-list p strong { font-weight: 700; }
 
 .contact-links { display: grid; grid-template-columns: 1.35fr .65fr; color: var(--paper); background: var(--ink); border-top: 1px solid rgba(238,233,220,.2); }
 .contact-block, .links-block { padding: clamp(85px, 9vw, 140px) 4vw; }
