@@ -6,7 +6,8 @@ import {DatabaseSync} from 'node:sqlite';
 import {onRequest} from '../functions/api/[[path]].js';
 import {handleApi} from '../lib/api.js';
 
-const data=JSON.parse(await readFile(new URL('../data/content.json',import.meta.url)));
+const data=JSON.parse(await readFile(new URL('./fixtures/legacy-content.json',import.meta.url)));
+const published=JSON.parse(await readFile(new URL('../data/content.json',import.meta.url)));
 const origin='https://admin.example';
 const settings={ADMIN_PASSWORD:'regression-test-password',SESSION_SECRET:'a'.repeat(40)};
 
@@ -14,7 +15,7 @@ test('all public archive routes contain full generated HTML and resolvable asset
  execFileSync(process.execPath,['scripts/build.mjs']);
  for(const path of ['news.html','HTML/news.html','CSS/news.html','CSS/news']){
   const html=await readFile(`dist/${path}`,'utf8');
-  assert.equal([...html.matchAll(/class="archive-item"/g)].length,data.news.length,path);
+  assert.equal([...html.matchAll(/class="archive-item"/g)].length,published.news.length,path);
   assert.match(html,/class="menu-button"/,`${path} has a usable header`);
   assert.doesNotMatch(html,/<noscript>/,`${path} must not retain the old JS-only placeholder`);
   for(const attribute of [...html.matchAll(/(?:href|src)="([^"]+)"/g)]){

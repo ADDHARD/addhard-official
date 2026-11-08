@@ -4,7 +4,7 @@ import {readFile} from 'node:fs/promises';
 import {handleApi} from '../lib/api.js';
 import {normalizeContent} from '../lib/content.js';
 
-const seed=JSON.parse(await readFile(new URL('../data/content.json',import.meta.url)));
+const seed=JSON.parse(await readFile(new URL('./fixtures/legacy-content.json',import.meta.url)));
 const origin='https://site.example';
 const png=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Wl6vWQAAAAASUVORK5CYII=','base64');
 async function fixture(){
@@ -29,18 +29,41 @@ test('old drafts receive catalogs without replacing unpublished NEWS or its base
  const response=await f.call('/api/content',{cookie:f.cookie});assert.equal(response.status,200);
  const result=await response.json();
  assert.equal(result.content.news[0].title,'保存中の未公開記事');assert.equal(result.content.shapekeys.length,9);assert.equal(result.content.eyeTextures.length,35);assert.equal(result.content.tools.length,4);
+ assert.equal(result.content.team.length,3);assert.equal(result.content.team[0].name,'がりゅー');
  assert.equal(result.baseSha,'old-sha');assert.equal(result.revision,0);
  assert.equal(Object.hasOwn(f.getDraft().content,'shapekeys'),false,'reading a legacy draft must not rewrite it');
 });
 
-test('an older editor cannot remove saved catalog collections by omitting them',async()=>{
- const f=await fixture();const complete=normalizeContent(seed);complete.shapekeys[0].name='新商品の表示名';
+test('TEAM contributions save and preview in groups of five without changing published content',async()=>{
+ const f=await fixture();const content=normalizeContent(seed);
+ content.team=[{...content.team[0],credits:Array.from({length:11},(_,i)=>`担当作品 ${i+1}`)}];
+ const saved=await f.call('/api/content',{method:'PUT',cookie:f.cookie,body:{revision:0,content}});assert.equal(saved.status,200);
+ const loaded=await f.call('/api/content',{cookie:f.cookie});assert.deepEqual((await loaded.json()).content.team[0].credits,content.team[0].credits);
+ f.assets.template=async()=>readFile('ADDHARD/HTML/index.html','utf8');
+ const preview=await f.call('/api/preview?section=team',{method:'POST',cookie:f.cookie,body:{content,archive:false}});assert.equal(preview.status,200);
+ const html=await preview.text();const columns=[...html.matchAll(/<ul class="member-credit-column">([\s\S]*?)<\/ul>/g)].map(match=>(match[1].match(/<li>/g)||[]).length);
+ assert.match(html,/<body data-preview-section="team">/);
+ assert.deepEqual(columns,[5,5,1]);assert.equal(f.getDraft().baseSha,'old-sha');
+ assert.equal(Object.hasOwn(seed,'team'),false,'legacy published data must remain untouched by draft edits');
+});
+
+test('TEAM-only uploaded images are validated and included in publication',async t=>{
+ const f=await fixture();const response=await f.call('/api/images',{method:'POST',cookie:f.cookie,body:png,raw:true,type:'image/png'});const {url}=await response.json();
+ const content=normalizeContent(seed);content.team[0].image=url;
+ await f.call('/api/content',{method:'PUT',cookie:f.cookie,body:{revision:0,content}});
+ t.mock.method(globalThis,'fetch',async(request,options)=>options.method==='GET'?Response.json({sha:'old-sha',content:Buffer.from(JSON.stringify(seed)).toString('base64')}):Response.json({content:{sha:'new-sha'},commit:{sha:'team-commit'}}));
+ const published=await f.call('/api/publish',{method:'POST',cookie:f.cookie,body:{revision:1}});assert.equal(published.status,200);assert.deepEqual(f.published,[url.split('/').at(-1)]);
+ assert.equal((await f.call(url)).status,200);
+});
+
+test('an older editor cannot remove saved catalogs or TEAM by omitting them',async()=>{
+ const f=await fixture();const complete=normalizeContent(seed);complete.shapekeys[0].name='新商品の表示名';complete.team[0].credits.push('追加の制作実績');
  let response=await f.call('/api/content',{method:'PUT',cookie:f.cookie,body:{revision:0,content:complete}});assert.equal(response.status,200);
  const legacy=structuredClone(seed);legacy.news[0].title='旧画面からのお知らせ更新';
  response=await f.call('/api/content',{method:'PUT',cookie:f.cookie,body:{revision:1,content:legacy}});assert.equal(response.status,200);
- assert.equal(f.getDraft().content.shapekeys[0].name,'新商品の表示名');assert.equal(f.getDraft().content.news[0].title,legacy.news[0].title);
- const empty=structuredClone(legacy);empty.shapekeys=[];
- response=await f.call('/api/content',{method:'PUT',cookie:f.cookie,body:{revision:2,content:empty}});assert.equal(response.status,200);assert.deepEqual(f.getDraft().content.shapekeys,[]);
+ assert.equal(f.getDraft().content.shapekeys[0].name,'新商品の表示名');assert.equal(f.getDraft().content.news[0].title,legacy.news[0].title);assert.equal(f.getDraft().content.team[0].credits.at(-1),'追加の制作実績');
+ const empty=structuredClone(legacy);empty.shapekeys=[];empty.team=[];
+ response=await f.call('/api/content',{method:'PUT',cookie:f.cookie,body:{revision:2,content:empty}});assert.equal(response.status,200);assert.deepEqual(f.getDraft().content.shapekeys,[]);assert.deepEqual(f.getDraft().content.team,[]);
 });
 
 test('image uploads require login and same Origin, and publish releases only referenced images',async t=>{

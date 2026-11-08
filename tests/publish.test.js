@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {handleApi} from '../lib/api.js';
 
-const seed=JSON.parse(await readFile(new URL('../data/content.json',import.meta.url)));
+const seed=JSON.parse(await readFile(new URL('./fixtures/legacy-content.json',import.meta.url)));
 const origin='https://admin.example';
 const endpoint='https://api.github.com/repos/ADDHARD/addhard-official/contents/data/content.json';
 const encode=data=>Buffer.from(JSON.stringify(data,null,2)+'\n','utf8').toString('base64');

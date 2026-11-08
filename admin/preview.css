@@ -2,3 +2,9 @@
 .product-track, .eye-track { display: block; transform: none !important; }
 .product-page, .eye-page { margin-bottom: 32px; }
 .carousel-nav { display: none; }
+/* A TEAM edit should open directly on the team rather than shift while the
+   large product preview above it lays out. The top-page button shows all. */
+body[data-preview-section="team"] .header,
+body[data-preview-section="team"] main > section:not(#team),
+body[data-preview-section="team"] footer { display: none; }
+body[data-preview-section="team"] .team { content-visibility: visible; contain-intrinsic-size: none; }

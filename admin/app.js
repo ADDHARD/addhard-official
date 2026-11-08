@@ -4,7 +4,8 @@ const sections = {
   qa: {title:'Q&A', list:'質問', edit:'質問と回答を編集'},
   shapekeys: {title:'ShapeKeys', list:'商品', edit:'ShapeKeysの商品を編集', label:'SHAPEKEY'},
   eyeTextures: {title:'EYE Textures', list:'商品', edit:'EYE Texturesの商品を編集', label:'EYE TEXTURE'},
-  tools: {title:'Tools', list:'商品', edit:'Toolsの商品を編集', label:'TOOL'}
+  tools: {title:'Tools', list:'商品', edit:'Toolsの商品を編集', label:'TOOL'},
+  team: {title:'TEAM', list:'メンバー', edit:'制作実績を編集'}
 };
 let content, revision=0, tab='news', selected=0, dirty=false, busy=false, canPublish=false, linkContext;
 const isProduct = key => ['shapekeys','eyeTextures','tools'].includes(key);
@@ -41,6 +42,7 @@ function state() {
   $('#workspace').setAttribute('aria-busy',String(busy));
   $('#publish').disabled=busy || !canPublish;
   for(const id of ['save','preview','add']) $('#'+id).disabled=busy;
+  if(tab==='team' && !content?.team?.length) $('#add').disabled=true;
 }
 async function run(fn) {
   if(busy) return;
@@ -65,7 +67,7 @@ function renderList() {
     const row=element('div','',{className:'item'+(index===selected?' selected':'')});
     const open=element('button','',{type:'button',className:'item-open'});
     open.setAttribute('aria-pressed',String(index===selected));
-    if(isProduct(tab)) {
+    if(isProduct(tab) || tab==='team') {
       const thumbnail=element('span','',{className:'list-image'});
       const source=imageSource(item.image);
       if(source) {
@@ -76,12 +78,13 @@ function renderList() {
       open.append(thumbnail);
     }
     const copy=element('span','',{className:'item-copy'});
-    copy.append(element('small',tab==='news' ? item.date : tab==='qa' ? `Q${String(index+1).padStart(2,'0')}` : (item.label || sections[tab].title)));
+    copy.append(element('small',tab==='news' ? item.date : tab==='qa' ? `Q${String(index+1).padStart(2,'0')}` : tab==='team' ? item.role : (item.label || sections[tab].title)));
     copy.append(element('span',item.title || item.question || item.name));
-    if(isProduct(tab) && !item.visible) copy.append(element('span','非表示',{className:'visibility-badge'}));
+    if((isProduct(tab) || tab==='team') && !item.visible) copy.append(element('span','非表示',{className:'visibility-badge'}));
     open.append(copy);
     open.onclick=()=>{if(busy)return; selected=index; render()};
     row.append(open);
+    if(tab==='team') {list.append(row); return}
     const order=element('div','',{className:'order'});
     for(const [label,delta] of [['↑',-1],['↓',1]]) {
       const button=element('button',label,{
@@ -196,6 +199,48 @@ function addAnswerLinkButton(form,input,item) {
   };
   form.append(insert,element('p','回答内の文字を選択して「リンクを挿入」を押すと、その文字からページを開けるようにできます。',{className:'hint'}));
 }
+function renderTeamEditor(form,item) {
+  const identity=element('div','',{className:'team-member-heading'});
+  const source=imageSource(item.image);
+  if(source) {
+    const image=element('img','',{src:source,alt:'',width:56,height:56,referrerPolicy:'no-referrer'});
+    image.onerror=()=>image.hidden=true;
+    identity.append(image);
+  }
+  const identityText=element('div');
+  identityText.append(element('small',item.role),element('h3',item.name));
+  identity.append(identityText); form.append(identity);
+  const label=element('label','制作実績の見出し');
+  const labelInput=element('input','',{type:'text',value:item.creditLabel || '',placeholder:'シェイプキー制作'});
+  labelInput.oninput=()=>{item.creditLabel=labelInput.value; mark()};
+  label.append(labelInput); form.append(label);
+  const creditsLabel=element('label','制作実績（1行に1件）');
+  const textarea=element('textarea','',{
+    id:'team-credits',value:item.credits.join('\n'),rows:9,className:'team-credits-input',
+    placeholder:'例：Minase Shapekey\nShinra Shapekey'
+  });
+  creditsLabel.append(textarea); form.append(creditsLabel);
+  form.append(element('p','入力した順に上から並びます。5件ごとに右の列へ続き、6件目は次の列の一番上に表示されます。空行は表示されません。',{className:'hint'}));
+  const preview=element('section','',{className:'team-credits-sample'});
+  const heading=element('div','',{className:'team-credits-sample-heading'});
+  const count=element('span','',{className:'hint'});
+  heading.append(element('h3','制作実績の並び方'),count);
+  const entries=element('div','',{className:'team-credits-columns'});
+  const empty=element('p','制作実績はまだありません。上の欄から入力できます。',{className:'hint'});
+  preview.append(heading,entries,empty); form.append(preview);
+  const updatePreview=()=>{
+    entries.replaceChildren();
+    for(const credit of item.credits) entries.append(element('span',credit));
+    const length=item.credits.length;
+    count.textContent=`${length}件・${Math.ceil(length/5)}列`;
+    empty.hidden=length>0; entries.hidden=length===0;
+  };
+  textarea.oninput=()=>{
+    item.credits=textarea.value.split(/\r?\n/).map(value=>value.trim()).filter(Boolean);
+    mark(); updatePreview();
+  };
+  updatePreview();
+}
 function render() {
   for(const button of document.querySelectorAll('[data-tab]')) {
     const active=button.dataset.tab===tab;
@@ -204,11 +249,14 @@ function render() {
   }
   $('#section-title').textContent=sections[tab].title;
   $('#list-title').textContent=`${sections[tab].list}一覧（${content[tab].length}件）`;
+  $('#add').textContent=tab==='team'?'＋ 制作実績':'＋ 追加';
+  $('#add').disabled=busy || (tab==='team' && !content.team.length);
   renderList();
   const form=$('#edit-form'); form.replaceChildren();
   const item=content[tab][selected];
-  if(!item) {form.append(element('p','「＋ 追加」からコンテンツを登録できます。')); return}
+  if(!item) {form.append(element('p',tab==='team'?'表示できるメンバーがありません。':'「＋ 追加」からコンテンツを登録できます。')); return}
   form.append(element('small','EDIT CONTENT'),element('h2',sections[tab].edit));
+  if(tab==='team') {renderTeamEditor(form,item); return}
   if(isProduct(tab)) {
     const visibleLabel=element('label','',{className:'visibility-control'});
     const checkbox=element('input','',{type:'checkbox',checked:item.visible});
@@ -263,6 +311,15 @@ for(const button of document.querySelectorAll('[data-tab]')) button.onclick=()=>
 };
 $('#add').onclick=()=>{
   if(busy)return;
+  if(tab==='team') {
+    const input=$('#team-credits');
+    if(!input)return;
+    if(input.value && !input.value.endsWith('\n')) input.value+='\n';
+    input.focus(); input.setSelectionRange(input.value.length,input.value.length);
+    input.scrollIntoView({block:'center',behavior:'smooth'});
+    status('制作実績を1行に1件入力してください。');
+    return;
+  }
   const id=crypto.randomUUID();
   const item=tab==='news'
     ? {id,date:new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Tokyo'}).format(new Date()),title:'新しいお知らせ',body:'',url:'',linkLabel:'詳しく見る'}
@@ -279,8 +336,9 @@ async function save() {
   status('下書きを保存しました。公式サイトはまだ更新されていません');
 }
 $('#save').onclick=()=>run(save);
-async function preview(archive=false) {
+async function preview(archive=false,section='') {
   const form=$('#preview-request');
+  form.action='/api/preview'+(section==='team'?'?section=team#team':'');
   form.elements.namedItem('content').value=JSON.stringify(content);
   form.elements.namedItem('archive').value=String(archive);
   if(!$('#preview-dialog').open) $('#preview-dialog').showModal();
@@ -293,7 +351,7 @@ $('#preview-dialog iframe').addEventListener('load',()=>{
     catch {status('プレビューを読み込めませんでした',true)}
   }
 });
-$('#preview').onclick=()=>run(()=>preview(tab==='news'));
+$('#preview').onclick=()=>run(()=>preview(tab==='news',tab==='team'?'team':''));
 $('#preview-home').onclick=()=>run(()=>preview(false));
 $('#preview-news').onclick=()=>run(()=>preview(true));
 $('#close-preview').onclick=()=>$('#preview-dialog').close();

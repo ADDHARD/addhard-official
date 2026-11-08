@@ -139,7 +139,7 @@ img { display: block; max-width: 100%; }
 .team-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 40px; margin-bottom: 70px; }
 .team-heading h2 { margin: 0; font-size: clamp(53px, 7.5vw, 110px); letter-spacing: -.075em; line-height: .78; text-align: right; }
 .member-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
-.member-card { display: flex; min-height: 390px; flex-direction: column; justify-content: space-between; padding: clamp(20px, 2.2vw, 34px); border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.member-card { display: flex; min-width: 0; min-height: 390px; flex-direction: column; justify-content: space-between; padding: clamp(20px, 2.2vw, 34px); border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
 .member-top { display: flex; align-items: flex-start; justify-content: space-between; }
 .member-top > span { font-size: 10px; letter-spacing: .12em; }
 .member-mark { position: relative; display: grid; width: clamp(70px, 7vw, 105px); aspect-ratio: 1; overflow: hidden; border-radius: 50%; color: var(--paper); background: var(--ink); font-size: clamp(28px, 3vw, 46px); font-weight: 700; place-items: center; }
@@ -148,7 +148,14 @@ img { display: block; max-width: 100%; }
 .member-card p { margin: 0 0 8px; color: #96710d; font-size: 9px; font-weight: 700; letter-spacing: .16em; }
 .member-card h3 { margin: 0 0 22px; font-size: clamp(30px, 3.2vw, 48px); letter-spacing: -.05em; }
 .member-card small { font-size: 8px; letter-spacing: .13em; }
-.member-x { display: grid; grid-template-columns: 18px 1fr auto; gap: 10px; align-items: center; margin-top: 22px; padding-top: 15px; border-top: 1px solid var(--line); font-size: 10px; letter-spacing: .08em; transition: color .25s, padding .25s; }
+.member-details { min-width: 0; }
+.member-details > p, .member-details h3, .member-credit-label { overflow-wrap: anywhere; }
+.member-credit-label { display: block; margin-bottom: 2px; }
+.member-credit-columns { display: flex; max-width: 100%; gap: 18px; overflow-x: auto; padding-bottom: 3px; font-size: 8px; line-height: 1.6; letter-spacing: .13em; scrollbar-width: thin; }
+.member-credit-column { flex: 0 0 auto; margin: 0; padding: 0; list-style: none; }
+.member-credit-column li { white-space: nowrap; }
+.member-x { display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; gap: 10px; align-items: center; margin-top: 22px; padding-top: 15px; border-top: 1px solid var(--line); font-size: 10px; letter-spacing: .08em; transition: color .25s, padding .25s; }
+.member-x > span { min-width: 0; overflow-wrap: anywhere; }
 .member-x:hover { padding-right: 5px; padding-left: 5px; color: #96710d; }
 .member-x svg { width: 16px; height: 16px; fill: currentColor; }
 .member-x i { font-style: normal; }

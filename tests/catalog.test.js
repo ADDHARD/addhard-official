@@ -5,7 +5,7 @@ import vm from 'node:vm';
 import {catalogDefaults} from '../lib/catalog-defaults.js';
 import {normalizeContent,validate,validImage,renderPage,catalogHtml,qaHtml,answerHtml} from '../lib/content.js';
 
-const legacy=JSON.parse(await readFile(new URL('../data/content.json',import.meta.url)));
+const legacy=JSON.parse(await readFile(new URL('./fixtures/legacy-content.json',import.meta.url)));
 const template=await readFile(new URL('../ADDHARD/HTML/index.html',import.meta.url),'utf8');
 
 test('old drafts migrate all current cards without mutating old data or clearing explicit empty collections',()=>{
