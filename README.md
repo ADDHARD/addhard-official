@@ -17,7 +17,7 @@ http://localhost:8788/admin/ を開き、`addhard-local` でログインしま�
 
 ## Cloudflare Pagesへ導入
 
-1. この変更を `ADDHARD/addhard-official` に反映します。現在は作業ブランチのみで、本番へのpushはしていません。
+1. このコードを `ADDHARD/addhard-official` の公開ブランチへ反映します。
 2. Pagesのプロジェクト設定を、リポジトリルートを作業ディレクトリ、ビルドコマンド `node scripts/build.mjs`、出力ディレクトリ `dist` にします。既存の `ADDHARD` サブディレクトリ設定がある場合は変更が必要です。Functionsはルートの `functions/` から読み込まれます。
 3. Cloudflare D1データベースを作成し、`schema.sql` を実行してテーブルを用意します。PagesのBindingsに `DB` という名前で接続します。本番とプレビューは別DBにしてください。
 4. Pages Functionsの暗号化されたシークレットに以下を登録し、再デプロイします。GitHubトークンはチャット・HTML・リポジトリに書かないでください。
