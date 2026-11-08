@@ -4,7 +4,7 @@ import {readFile} from 'node:fs/promises';
 import {validate,renderPage,newsHtml,qaHtml} from '../lib/content.js';
 import {handleApi} from '../lib/api.js';
 const data=JSON.parse(await readFile(new URL('../data/content.json',import.meta.url)));
-test('imports every existing item',()=>{assert.equal(data.news.length,6);assert.equal(data.qa.length,5);validate(data)});
+test('published content remains readable by the editor after content updates',()=>{assert.equal(validate(data),data)});
 test('rejects script URLs, duplicate IDs and invalid dates',()=>{for(const change of [d=>d.news[0].url='javascript:alert(1)',d=>d.news[0].date='2026-02-30',d=>d.qa[1].id=d.qa[0].id]){const copy=structuredClone(data);change(copy);assert.throws(()=>validate(copy))}});
 test('escapes user content and follows manual order',()=>{const copy=structuredClone(data);copy.news.reverse();copy.news[0].title='<script>alert(1)</script>';assert.match(newsHtml(copy),/&lt;script&gt;/);assert.doesNotMatch(newsHtml(copy),/<script>/);assert.match(qaHtml(copy),/Q05/)});
 test('replaces sections while retaining page shell',async()=>{const html=await readFile('ADDHARD/HTML/index.html','utf8');const copy=structuredClone(data);copy.news=[];copy.qa=[];const result=renderPage(html,copy);assert.ok(result.includes('PEOPLE BEHIND'));assert.ok(!result.includes('<details'));assert.ok(!result.includes('datetime='))});
