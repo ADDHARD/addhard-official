@@ -1,0 +1,23 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import {validate,renderPage,newsHtml,qaHtml} from '../lib/content.js';
+import {handleApi} from '../lib/api.js';
+const data=JSON.parse(await readFile(new URL('../data/content.json',import.meta.url)));
+test('imports every existing item',()=>{assert.equal(data.news.length,6);assert.equal(data.qa.length,5);validate(data)});
+test('rejects script URLs, duplicate IDs and invalid dates',()=>{for(const change of [d=>d.news[0].url='javascript:alert(1)',d=>d.news[0].date='2026-02-30',d=>d.qa[1].id=d.qa[0].id]){const copy=structuredClone(data);change(copy);assert.throws(()=>validate(copy))}});
+test('escapes user content and follows manual order',()=>{const copy=structuredClone(data);copy.news.reverse();copy.news[0].title='<script>alert(1)</script>';assert.match(newsHtml(copy),/&lt;script&gt;/);assert.doesNotMatch(newsHtml(copy),/<script>/);assert.match(qaHtml(copy),/Q05/)});
+test('replaces sections while retaining page shell',async()=>{const html=await readFile('ADDHARD/HTML/index.html','utf8');const copy=structuredClone(data);copy.news=[];copy.qa=[];const result=renderPage(html,copy);assert.ok(result.includes('PEOPLE BEHIND'));assert.ok(!result.includes('<details'));assert.ok(!result.includes('datetime='))});
+test('authentication, origin guard, CAS saves, and logout',async()=>{
+ let draft={content:data,revision:0,baseSha:null};const env={ADMIN_PASSWORD:'test-password',SESSION_SECRET:'a'.repeat(40)};
+ const store={attempt:async()=>true,get:async()=>draft,save:async(rev,content)=>rev===draft.revision?(draft={...draft,content,revision:rev+1}):null};
+ const call=(path,method='GET',body,cookie,origin='http://localhost')=>handleApi(new Request('http://localhost/api/'+path,{method,headers:{origin,...(cookie?{cookie}:{}),'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{})}),env,store,{});
+ assert.equal((await call('content')).status,401);
+ assert.equal((await call('login','POST',{password:'test-password'},null,'https://evil.example')).status,403);
+ assert.equal((await call('login','POST',{password:'wrong'})).status,401);
+ const login=await call('login','POST',{password:'test-password'});assert.equal(login.status,200);const cookie=login.headers.get('set-cookie').split(';')[0];assert.ok(login.headers.get('set-cookie').includes('HttpOnly'));
+ assert.equal((await call('content','GET',null,cookie)).status,200);
+ assert.equal((await call('content','PUT',{revision:0,content:data},cookie)).status,200);
+ assert.equal((await call('content','PUT',{revision:0,content:data},cookie)).status,409);
+ assert.match((await call('logout','POST',{},cookie)).headers.get('set-cookie'),/Max-Age=0/);
+});

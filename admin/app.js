@@ -1,0 +1,29 @@
+const $=s=>document.querySelector(s);
+let content,revision=0,tab='news',selected=0,dirty=false,busy=false,canPublish=false;
+const status=(message,error=false)=>{$('#status').textContent=message;$('#status').classList.toggle('error',error)};
+async function api(path,method='GET',body){const response=await fetch('/api/'+path,{method,headers:{'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{})});const data=await response.json();if(!response.ok)throw new Error(data.error);return data}
+function state(){ $('#save-state').textContent=dirty?'● 未保存の変更があります':'✓ 下書き保存済み';$('#publish').disabled=busy||!canPublish;for(const id of ['save','preview','add'])$('#'+id).disabled=busy;}
+async function run(fn){if(busy)return;busy=true;state();try{await fn()}catch(e){status(e.message,true)}finally{busy=false;state()}}
+function mark(){dirty=true;state()}
+function element(tag,text,props={}){const e=document.createElement(tag);if(text)e.textContent=text;Object.assign(e,props);return e}
+function renderList(){const list=$('#items');list.replaceChildren();content[tab].forEach((item,i)=>{const row=element('div','',{className:'item'+(i===selected?' selected':'')});const open=element('button','',{type:'button'});open.append(element('small',tab==='news'?item.date:`Q${String(i+1).padStart(2,'0')}`),element('span',item.title||item.question));open.onclick=()=>{selected=i;render()};row.append(open);const order=element('div','',{className:'order'});for(const [label,delta] of [['↑',-1],['↓',1]]){const btn=element('button',label,{disabled:i+delta<0||i+delta>=content[tab].length,title:label==='↑'?'上へ移動':'下へ移動'});btn.onclick=()=>{[content[tab][i],content[tab][i+delta]]=[content[tab][i+delta],content[tab][i]];selected=i+delta;mark();render()};order.append(btn)}row.append(order);list.append(row)});}
+function render(){for(const btn of document.querySelectorAll('[data-tab]'))btn.classList.toggle('active',btn.dataset.tab===tab);$('#section-title').textContent=tab==='news'?'NEWS':'Q&A';$('#list-title').textContent=(tab==='news'?'お知らせ':'質問')+`一覧（${content[tab].length}件）`;renderList();const form=$('#edit-form');form.replaceChildren();const item=content[tab][selected];if(!item){form.append(element('p','「＋ 追加」からコンテンツを登録できます。'));return}
+ form.append(element('small','EDIT CONTENT'),element('h2',tab==='news'?'お知らせを編集':'質問と回答を編集'));
+ const fields=tab==='news'?[['date','日付','date'],['title','タイトル *','text'],['body','本文','textarea'],['url','リンク先（https://… または #qa）','text'],['linkLabel','リンクの表示名','text']]:[['question','質問 *','text'],['answer','回答 *','textarea']];
+ for(const [key,label,type]of fields){const wrap=element('label',label);const input=element(type==='textarea'?'textarea':'input','',{value:item[key]});if(type!=='textarea')input.type=type;input.oninput=()=>{item[key]=input.value;mark();renderList()};wrap.append(input);form.append(wrap)}
+ form.append(element('p','改行はそのまま反映されます。HTMLタグは文字として表示されます。',{className:'hint'}));
+ const del=element('button','この項目を削除',{className:'delete'});del.onclick=()=>{if(confirm('この項目を下書きから削除しますか？')){content[tab].splice(selected,1);selected=Math.max(0,selected-1);mark();render()}};form.append(del);
+}
+async function load(){const data=await api('content');content=data.content;revision=data.revision;canPublish=data.canPublish;dirty=false;$('#login').hidden=true;$('#workspace').hidden=false;render();state();status(canPublish?'下書きを読み込みました':'ローカル確認中です。GitHub接続後に公開できます')}
+$('#login').onsubmit=async e=>{e.preventDefault();try{await api('login','POST',{password:$('#password').value});$('#password').value='';await load()}catch(e){status(e.message,true)}};
+for(const btn of document.querySelectorAll('[data-tab]'))btn.onclick=()=>{if(!content)return;tab=btn.dataset.tab;selected=0;render()};
+$('#add').onclick=()=>{const item=tab==='news'?{id:crypto.randomUUID(),date:new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Tokyo'}).format(new Date()),title:'新しいお知らせ',body:'',url:'',linkLabel:'詳しく見る'}:{id:crypto.randomUUID(),question:'新しい質問',answer:''};content[tab].push(item);selected=content[tab].length-1;mark();render()};
+async function save(){const snapshot=structuredClone(content);const result=await api('content','PUT',{content:snapshot,revision});revision=result.revision;dirty=JSON.stringify(snapshot)!==JSON.stringify(content);status('下書きを保存しました。公式サイトはまだ更新されていません')}
+$('#save').onclick=()=>run(save);
+async function preview(archive=false){const form=$('#preview-request');form.elements.namedItem('content').value=JSON.stringify(content);form.elements.namedItem('archive').value=String(archive);if(!$('#preview-dialog').open)$('#preview-dialog').showModal();form.submit()}
+$('#preview-dialog iframe').addEventListener('load',()=>{const document=$('#preview-dialog iframe').contentDocument;if(document?.contentType==='application/json'){try{status(JSON.parse(document.body.textContent).error,true);$('#preview-dialog').close()}catch{status('プレビューを読み込めませんでした',true)}}});
+$('#preview').onclick=()=>run(()=>preview(tab==='qa'?false:true));$('#preview-home').onclick=()=>run(()=>preview(false));$('#preview-news').onclick=()=>run(()=>preview(true));$('#close-preview').onclick=()=>$('#preview-dialog').close();
+$('#publish').onclick=()=>run(async()=>{await save();if(!dirty)$('#publish-dialog').showModal()});$('#cancel-publish').onclick=()=>$('#publish-dialog').close();$('#confirm-publish').onclick=()=>{$('#publish-dialog').close();run(async()=>{const result=await api('publish','POST',{revision});status(result.message)})};
+$('#logout').onclick=()=>run(async()=>{if(dirty&&!confirm('未保存の変更があります。ログアウトしますか？'))return;await api('logout','POST');location.reload()});
+addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue=''}});
+api('content').then(data=>{content=data.content;revision=data.revision;canPublish=data.canPublish;$('#login').hidden=true;$('#workspace').hidden=false;render();state();status('下書きを読み込みました')}).catch(()=>{});
