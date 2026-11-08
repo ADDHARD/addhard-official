@@ -1,0 +1,4 @@
+/* Show every carousel page without executing scripts in a draft preview. */
+.product-track, .eye-track { display: block; transform: none !important; }
+.product-page, .eye-page { margin-bottom: 32px; }
+.carousel-nav { display: none; }

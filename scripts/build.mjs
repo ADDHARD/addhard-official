@@ -20,5 +20,5 @@ await writeFile('dist/JS/main.js',main);
 const index=await readFile('dist/HTML/index.html','utf8');
 await writeFile('dist/index.html',index.replaceAll('../CSS/','/CSS/').replaceAll('../JS/','/JS/').replaceAll('../IMG/','/IMG/'));
 await writeFile('dist/_routes.json',JSON.stringify({version:1,include:['/api/*'],exclude:[]}));
-await writeFile('dist/_headers','/admin/*\n  Cache-Control: no-store\n  X-Robots-Tag: noindex, nofollow\n  X-Frame-Options: DENY\n  Content-Security-Policy: default-src \'self\'; script-src \'self\'; style-src \'self\'; frame-src \'self\'; base-uri \'self\'; form-action \'self\'\n/CSS/news\n  Content-Type: text/html; charset=utf-8\n');
+await writeFile('dist/_headers','/admin/*\n  Cache-Control: no-store\n  X-Robots-Tag: noindex, nofollow\n  X-Frame-Options: DENY\n  Content-Security-Policy: default-src \'self\'; script-src \'self\'; style-src \'self\'; img-src \'self\' https: blob:; frame-src \'self\'; base-uri \'self\'; form-action \'self\'\n/CSS/news\n  Content-Type: text/html; charset=utf-8\n');
 console.log('Built dist: site + admin');

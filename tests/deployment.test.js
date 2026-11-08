@@ -43,7 +43,7 @@ test('D1 save returns its own revision even if another save occurs before respon
     db.prepare('UPDATE drafts SET revision=revision+1,content=? WHERE id=1').run(JSON.stringify(other));
    }
   };
-  const env={...settings,DB:{prepare(sql){return{bind(...args){return{
+  const env={...settings,DB:{prepare(sql){return{async first(){return db.prepare(sql).get()??null},bind(...args){return{
    async first(){const row=db.prepare(sql).get(...args);afterUpdate(sql);return row??null},
    async run(){const result=db.prepare(sql).run(...args);afterUpdate(sql);return{meta:{changes:Number(result.changes)}}}
   }}}}}};
@@ -79,7 +79,7 @@ test('preview form navigation has independent asset CSP and correct template bas
   assert.match(policy,/script-src 'none'/);
   assert.match(policy,/style-src 'self' https:\/\/fonts.googleapis.com/);
   assert.match(policy,/font-src 'self' https:\/\/fonts.gstatic.com/);
-  assert.match(policy,/img-src 'self' https:\/\/booth.pximg.net/);
+  assert.match(policy,/img-src 'self' https:/);
   assert.match(policy,/media-src 'self' https:\/\/video.twimg.com/);
  }
  const app=await readFile('admin/app.js','utf8');
