@@ -87,6 +87,16 @@
   ],
   "shapekeys": [
     {
+      "id": "5852338b-79db-4a11-91d7-c0d0398ea720",
+      "name": "ドラゴニュート・ヴラウ",
+      "label": "SHAPEKEY",
+      "description": "",
+      "url": "https://addhard.booth.pm/items/9092145",
+      "image": "https://booth.pximg.net/f313133c-b9b8-4ba8-ab01-5762d38d9371/i/9092145/38694ff3-a244-4d53-9a51-dca8e591465e_base_resized.jpg",
+      "alt": "ヴラウ追加シェイプキー",
+      "visible": true
+    },
+    {
       "id": "shapekey-8821073",
       "name": "Milltina",
       "label": "SHAPEKEY",
